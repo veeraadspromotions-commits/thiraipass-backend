@@ -13,10 +13,10 @@
     .logo { font-size: 20px; font-weight: bold; color: #ef4444; }
     .city-select { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; outline: none; }
 
-    /* Container */
+    /* Location Bar */
     .container { padding: 16px; }
-    .location-banner { background: #1e293b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #38bdf8; }
-    .detect-btn { background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .location-banner { background: #1e293b; padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #22c55e; }
+    .detect-btn { background: #22c55e; color: #0f172a; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
     h2 { font-size: 17px; margin-bottom: 12px; color: #e2e8f0; }
     .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
@@ -27,14 +27,15 @@
     .movie-meta { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
     /* Modal Sheet */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20; justify-content: flex-end; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20; justify-content: flex-end; }
     .modal-content { background: #1e293b; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; padding: 20px; overflow-y: auto; }
-    .close-btn { float: right; font-size: 20px; cursor: pointer; color: #94a3b8; }
+    .close-btn { float: right; font-size: 22px; cursor: pointer; color: #94a3b8; }
     
     .theatre-card { background: #0f172a; padding: 14px; border-radius: 10px; margin-top: 12px; border: 1px solid #334155; }
     .show-btn { background: #334155; border: 1px solid #22c55e; color: #22c55e; padding: 6px 14px; border-radius: 6px; margin: 8px 6px 0 0; font-size: 13px; font-weight: bold; cursor: pointer; }
-    
-    /* Screen & Seats */
+    .show-btn:hover { background: #22c55e; color: #000; }
+
+    /* Seats Layout */
     .screen-container { margin: 20px 0; text-align: center; }
     .screen { height: 6px; background: #38bdf8; border-radius: 4px; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4); margin-bottom: 20px; }
     .seats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 320px; margin: 0 auto; }
@@ -56,6 +57,7 @@
   <header>
     <div class="logo">🎟️ ThiraiPass</div>
     <select class="city-select" id="cityDropdown" onchange="changeCity(this.value)">
+      <option value="Tirunelveli">📍 திருநெல்வேலி</option>
       <option value="Chennai">📍 சென்னை</option>
       <option value="Coimbatore">📍 கோயம்புத்தூர்</option>
       <option value="Madurai">📍 மதுரை</option>
@@ -65,8 +67,8 @@
 
   <div class="container">
     <div class="location-banner">
-      <span id="locationText">இருப்பிடம்: சென்னை (தானியங்கி)</span>
-      <button class="detect-btn" onclick="detectGPS()">GPS கண்டறி</button>
+      <span id="locationText">இருப்பிடம்: திருநெல்வேலி</span>
+      <button class="detect-btn" onclick="detectRealGPS()">📡 GPS கண்டறி</button>
     </div>
 
     <h2>சமீபத்திய வெளியீடுகள் (Now Showing)</h2>
@@ -81,7 +83,7 @@
       <p id="modalMovieMeta" style="color:#94a3b8; font-size: 13px; margin-bottom: 12px;"></p>
 
       <div id="theatreSection">
-        <h4 style="margin-top:10px;">அருகில் உள்ள திரையரங்குகள்:</h4>
+        <h4 style="margin-top:10px;"><span id="theatreCityLabel">திருநெல்வேலி</span> திரையரங்குகள்:</h4>
         <div id="theatresList"></div>
       </div>
 
@@ -107,67 +109,102 @@
   </div>
 
   <script>
-    // ஊர் வாரியான திரையரங்குகள் தரவு (Local Theatres Data)
+    // ஊர் வாரியான உள்ளூர் தியேட்டர்கள் (Local Theatres)
     const cityTheatres = {
+      "Tirunelveli": [
+        { name: "ராம் முத்துராம் சினிமாஸ் (Ram Muthuram)", loc: "வண்ணார்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:30 PM", "10:15 PM"] },
+        { name: "பெரின்ப விலாஸ் (PV Multiplex)", loc: "திருநெல்வேலி ஜங்ஷன்", shows: ["11:00 AM", "02:45 PM", "06:45 PM", "10:00 PM"] },
+        { name: "ரத்னா தியேட்டர் (Ratna Multiplex)", loc: "வண்ணார்பேட்டை", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] },
+        { name: "பாம்பே தியேட்டர்", loc: "சந்திப்பு ரோடு", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
+      ],
       "Chennai": [
-        { name: "SPI Cinemas (சத்யம்)", loc: "ராயப்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:45 PM", "10:00 PM"] },
-        { name: "ரோகிணி சில்வர் ஸ்கிரீன்ஸ்", loc: "கோயம்பேடு", shows: ["11:00 AM", "02:30 PM", "06:30 PM", "10:15 PM"] },
-        { name: "PVR VR Mall", loc: "அண்ணா நகர்", shows: ["01:15 PM", "04:45 PM", "08:00 PM"] },
+        { name: "SPI Cinemas (சத்யம்)", loc: "ராயப்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:45 PM"] },
+        { name: "ரோகிணி சில்வர் ஸ்கிரீன்ஸ்", loc: "கோயம்பேடு", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
         { name: "வெற்றி சினிமாஸ்", loc: "குரோம்பேட்டை", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
       ],
       "Coimbatore": [
         { name: "Broadway Cinemas", loc: "அவினாசி ரோடு", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] },
-        { name: "KG Cinemas", loc: "ரேஸ்கோர்ஸ்", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] },
-        { name: "INOX Prozone Mall", loc: "சரவணம்பட்டி", shows: ["01:00 PM", "05:00 PM", "09:00 PM"] }
+        { name: "KG Cinemas", loc: "ரேஸ்கோர்ஸ்", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
       ],
       "Madurai": [
         { name: "Vetri Cinemas", loc: "வில்லாபுரம்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
-        { name: "Gopuram Cinemas", loc: "பெரியார் பேருந்து நிலையம்", shows: ["10:30 AM", "02:00 PM", "06:00 PM"] }
+        { name: "Gopuram Cinemas", loc: "பெரியார்", shows: ["10:30 AM", "02:00 PM", "06:00 PM"] }
       ],
       "Trichy": [
-        { name: "LA Cinemas (Maris)", loc: "தில்லை நகர்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
-        { name: "Mega Star Cinemas", loc: "மத்திய பேருந்து நிலையம்", shows: ["10:30 AM", "02:15 PM", "06:45 PM"] }
+        { name: "LA Cinemas", loc: "தில்லை நகர்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] }
       ]
     };
 
-    // சமீபத்திய படங்கள் (Latest Movies)
     const latestMovies = [
-      { id: 1, title: "லியோ (Leo)", language: "தமிழ்", genre: "Action / Thriller", duration: "2h 44m", poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
-      { id: 2, title: "ஜெயிலர் (Jailer)", language: "தமிழ்", genre: "Action / Drama", duration: "2h 48m", poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500" },
-      { id: 3, title: "அமரன் (Amaran)", language: "தமிழ்", genre: "Biographical Action", duration: "2h 49m", poster: "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=500" },
-      { id: 4, title: "GOAT", language: "தமிழ்", genre: "Sci-Fi Action", duration: "3h 03m", poster: "https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=500" }
+      { id: 1, title: "அமரன் (Amaran)", language: "தமிழ்", genre: "Biographical Action", duration: "2h 49m", poster: "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=500" },
+      { id: 2, title: "GOAT (The Greatest Of All Time)", language: "தமிழ்", genre: "Sci-Fi Action", duration: "3h 03m", poster: "https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=500" },
+      { id: 3, title: "லியோ (Leo)", language: "தமிழ்", genre: "Action / Thriller", duration: "2h 44m", poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
+      { id: 4, title: "ஜெயிலர் (Jailer)", language: "தமிழ்", genre: "Action / Drama", duration: "2h 48m", poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500" }
     ];
 
-    let currentCity = "Chennai";
+    let currentCity = "Tirunelveli";
     let selectedMovie = null;
     let selectedSeats = [];
     const ticketPrice = 190;
 
-    // GPS இருப்பிடம் கண்டறிதல்
-    function detectGPS() {
+    // உண்மையான GPS சாட்டிலைட் மூலம் இருப்பிடம் அறிதல்
+    async function detectRealGPS() {
       const locText = document.getElementById("locationText");
-      locText.innerText = "GPS தேடப்படுகிறது...";
+      locText.innerText = "GPS செயற்கைக்கோள் தேடுகிறது...";
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            // மாதிரி: தமிழ்நாட்டில் இருந்தால் தானாக சென்னைக்கு செட் ஆகும்
-            locText.innerText = "இருப்பிடம்: சென்னை (GPS உறுதிசெய்யப்பட்டது ✅)";
-            document.getElementById("cityDropdown").value = "Chennai";
-            changeCity("Chennai");
-          },
-          (err) => {
-            locText.innerText = "GPS அனுமதி மறுக்கப்பட்டது. ஊரைத் தேர்ந்தெடுக்கவும்.";
-          }
-        );
-      } else {
-        locText.innerText = "உங்கள் உலாவியில் GPS வசதி இல்லை.";
+      if (!navigator.geolocation) {
+        locText.innerText = "GPS வசதி உங்கள் பிரவுசரில் இல்லை.";
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          locText.innerText = "ஊர் கண்டறியப்படுகிறது...";
+
+          try {
+            // இலவச ரிவர்ஸ் ஜியோகோடிங் API
+            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+            const data = await response.json();
+            
+            // நகரம் அல்லது மாவட்டத்தைக் கண்டறிதல்
+            let detectedCity = data.city || data.locality || data.principalSubdivision;
+
+            if (data.city && data.city.includes("Tirunelveli")) {
+              detectedCity = "Tirunelveli";
+            } else if (data.locality && data.locality.includes("Tirunelveli")) {
+              detectedCity = "Tirunelveli";
+            }
+
+            locText.innerText = `இருப்பிடம்: ${detectedCity} (GPS உறுதிசெய்யப்பட்டது ✅)`;
+            
+            // பட்டியலில் இருந்தால் அந்த ஊரை மாற்றுதல்
+            if (cityTheatres[detectedCity]) {
+              changeCity(detectedCity);
+              document.getElementById("cityDropdown").value = detectedCity;
+            } else {
+              // திருநெல்வேலிக்கு தானாக மாற்றுதல்
+              changeCity("Tirunelveli");
+              document.getElementById("cityDropdown").value = "Tirunelveli";
+            }
+          } catch (e) {
+            locText.innerText = "இருப்பிடம்: திருநெல்வேலி (இயல்புநிலை)";
+            changeCity("Tirunelveli");
+          }
+        },
+        (error) => {
+          locText.innerText = "GPS அனுமதி மறுக்கப்பட்டது. திருநெல்வேலி வைக்கப்பட்டுள்ளது.";
+          changeCity("Tirunelveli");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
     }
 
     function changeCity(city) {
       currentCity = city;
       document.getElementById("locationText").innerText = `இருப்பிடம்: ${city}`;
+      document.getElementById("theatreCityLabel").innerText = city;
     }
 
     function loadMovies() {
@@ -190,8 +227,9 @@
       selectedMovie = latestMovies.find(m => m.id === movieId);
       document.getElementById("modalMovieTitle").innerText = selectedMovie.title;
       document.getElementById("modalMovieMeta").innerText = `${selectedMovie.genre} | ${selectedMovie.duration}`;
+      document.getElementById("theatreCityLabel").innerText = currentCity;
       
-      const theatres = cityTheatres[currentCity] || cityTheatres["Chennai"];
+      const theatres = cityTheatres[currentCity] || cityTheatres["Tirunelveli"];
       const theatresContainer = document.getElementById("theatresList");
       theatresContainer.innerHTML = "";
 
@@ -267,9 +305,9 @@
         <div class="ticket">
           <h3 style="color:#22c55e;">🎉 முன்பதிவு உறுதியானது!</h3>
           <p style="margin-top:8px;"><strong>படம்:</strong> ${selectedMovie.title}</p>
-          <p><strong>நகரம்:</strong> ${currentCity}</p>
+          <p><strong>ஊர்:</strong> ${currentCity}</p>
           <p><strong>இருக்கைகள்:</strong> ${selectedSeats.join(', ')}</p>
-          <p><strong>தொகை:</strong> ₹${selectedSeats.length * ticketPrice}</p>
+          <p><strong>செலுத்திய தொகை:</strong> ₹${selectedSeats.length * ticketPrice}</p>
           <div class="qr-box">QR TICKET<br>${bookingId}</div>
           <small style="color:#94a3b8;">தியேட்டர் வாசலில் இதைக் காட்டவும்</small>
         </div>
@@ -281,9 +319,8 @@
       document.getElementById("checkoutBar").style.display = "none";
     }
 
-    // தொடக்கம்
     loadMovies();
-    detectGPS();
+    detectRealGPS();
   </script>
 </body>
 </html>
