@@ -14,7 +14,7 @@
     .logo { font-size: 20px; font-weight: bold; color: #ef4444; }
     .city-select { background: #0f172a; color: #38bdf8; border: 1px solid #475569; padding: 6px 10px; border-radius: 16px; font-size: 12px; font-weight: bold; outline: none; }
 
-    /* Navigation Bar (Tabs) - 404 Error வரவே வராது */
+    /* Navigation Tabs */
     .nav-tabs { display: flex; background: #0f172a; border-radius: 8px; margin-top: 10px; padding: 4px; gap: 4px; }
     .nav-tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: bold; color: #94a3b8; border-radius: 6px; cursor: pointer; border: none; background: transparent; }
     .nav-tab.active { background: #ef4444; color: white; }
@@ -23,12 +23,17 @@
     .card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155; }
     h3 { font-size: 16px; margin-bottom: 12px; color: #38bdf8; }
 
-    /* Common Form Styles */
+    /* Forms */
     label { font-size: 13px; color: #94a3b8; display: block; margin-top: 10px; margin-bottom: 4px; }
     input, select { width: 100%; background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; }
     input:focus, select:focus { border-color: #38bdf8; }
     .btn-primary { background: #ef4444; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 16px; cursor: pointer; }
     .btn-green { background: #22c55e; color: #000; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 16px; cursor: pointer; }
+
+    /* Auth Sub-tabs (Login / Register) */
+    .auth-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .auth-tab { flex: 1; padding: 8px; background: #0f172a; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; }
+    .auth-tab.active { background: #ef4444; color: white; }
 
     /* Customer View */
     .location-banner { background: #1e293b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #22c55e; }
@@ -84,7 +89,7 @@
       </select>
     </div>
     
-    <!-- 3 முக்கிய டேப்கள் - நேரடி மாறுதல் -->
+    <!-- 3 முக்கிய பிரிவுகள் -->
     <div class="nav-tabs">
       <button class="nav-tab active" id="tabCustomer" onclick="showView('customer')">🎬 படங்கள் (Movies)</button>
       <button class="nav-tab" id="tabManager" onclick="showView('manager')">👔 மேனேஜர் அட்மின்</button>
@@ -94,9 +99,7 @@
 
   <div class="container">
 
-    <!-- ========================================== -->
-    <!-- 1. CUSTOMER VIEW: படங்கள் & இருக்கை முன்பதிவு -->
-    <!-- ========================================== -->
+    <!-- 1. CUSTOMER VIEW: படங்கள் -->
     <div id="viewCustomer">
       <div class="location-banner">
         <span id="locationText">இருப்பிடம்: திருநெல்வேலி</span>
@@ -107,28 +110,57 @@
       <div class="movie-grid" id="moviesList"></div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 2. MANAGER VIEW: மேனேஜர் அட்மின் பலகை -->
-    <!-- ========================================== -->
+    <!-- 2. MANAGER VIEW: உள்நுழைவு & புதிய பதிவு -->
     <div id="viewManager" style="display:none;">
       
-      <!-- Manager Login -->
-      <div id="mgrLoginCard" class="card">
-        <h3>👔 திரையரங்கு மேனேஜர் உள்நுழைவு</h3>
-        <label>மேனேஜர் மொபைல் எண்:</label>
-        <input type="tel" id="mgrPhone" value="9876543210">
+      <!-- Login & Register Switcher -->
+      <div id="mgrAuthBox" class="card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="authLoginTab" onclick="switchAuthTab('login')">உள்நுழைவு (Login)</button>
+          <button class="auth-tab" id="authRegTab" onclick="switchAuthTab('register')">புதிய பதிவு (Register)</button>
+        </div>
 
-        <label>மேனேஜர் அட்மின் கோட் (Admin Passcode):</label>
-        <input type="password" id="mgrPass" value="TPADMIN2026">
-        <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">சோதனை அட்மின் கோட்: <strong>TPADMIN2026</strong></small>
+        <!-- மேனேஜர் லாகின் படிவம் -->
+        <div id="mgrLoginForm">
+          <h3>👔 மேனேஜர் உள்நுழைவு</h3>
+          <label>மேனேஜர் மொபைல் எண்:</label>
+          <input type="tel" id="mgrPhone" placeholder="எ.கா: 9876543210">
 
-        <button class="btn-primary" onclick="loginManager()">மேலாண்மைத் திரையைத் திற</button>
+          <label>அட்மின் கோட் (Admin Passcode):</label>
+          <input type="password" id="mgrPass" placeholder="உங்கள் அட்மின் கோட்">
+          <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">சோதனை கோட்: <strong>TPADMIN2026</strong></small>
+
+          <button class="btn-primary" onclick="loginManager()">மேலாண்மைத் திரையைத் திற</button>
+        </div>
+
+        <!-- புதிய தியேட்டர் பதிவு படிவம் (Registration) -->
+        <div id="mgrRegisterForm" style="display:none;">
+          <h3>🏢 புதிய திரையரங்கு பதிவு</h3>
+          <label>திரையரங்கம் பெயர்:</label>
+          <input type="text" id="regTheatreName" placeholder="எ.கா: ராம் முத்துராம் சினிமாஸ்">
+
+          <label>நகரம் (City):</label>
+          <select id="regCity">
+            <option value="திருநெல்வேலி">திருநெல்வேலி</option>
+            <option value="சென்னை">சென்னை</option>
+            <option value="கோயம்புத்தூர்">கோயம்புத்தூர்</option>
+            <option value="மதுரை">மதுரை</option>
+          </select>
+
+          <label>மேனேஜர் மொபைல் எண்:</label>
+          <input type="tel" id="regPhone" placeholder="எ.கா: 9884334097">
+
+          <label>புதிய அட்மின் கோட் உருவாக்கவும் (Create Passcode):</label>
+          <input type="password" id="regPass" placeholder="எ.கா: 4 இலக்க PIN அல்லது பாஸ்வேர்ட்">
+
+          <button class="btn-green" onclick="registerNewTheatre()">பதிவு செய்து அட்மின் திரைக்குச் செல்</button>
+        </div>
       </div>
 
-      <!-- Manager Dashboard (After Login) -->
+      <!-- மேனேஜர் கட்டுப்பாட்டு பலகை (உள்நுழைந்த பிறகு) -->
       <div id="mgrDashboard" style="display:none;">
         <div class="revenue-card">
-          <span style="font-size: 13px; color: #94a3b8;">ராம் முத்துராம் சினிமாஸ் - இன்றைய வசூல்</span>
+          <span style="font-size: 13px; color: #94a3b8;" id="mgrTheatreDisplay">திரையரங்கு வசூல் விவரம்</span>
           <div class="revenue-amount">₹3,420</div>
           <small style="color: #38bdf8;">18 டிக்கெட்டுகள் விற்கப்பட்டுள்ளன</small>
         </div>
@@ -167,14 +199,12 @@
           <div id="activeShowsList"></div>
         </div>
 
-        <button class="btn-primary" style="background:#334155; color:#f87171;" onclick="logoutManager()">மேனேஜர் கணக்கிலிருந்து வெளியேறு</button>
+        <button class="btn-primary" style="background:#334155; color:#f87171;" onclick="logoutManager()">வெளியேறு (Logout)</button>
       </div>
 
     </div>
 
-    <!-- ========================================== -->
-    <!-- 3. GATE STAFF VIEW: டிக்கெட் ஸ்கேனர் & சரிபார்ப்பு -->
-    <!-- ========================================== -->
+    <!-- 3. GATE STAFF VIEW: டிக்கெட் ஸ்கேனர் -->
     <div id="viewGate" style="display:none;">
       <div class="card">
         <h3>🔍 கேட் டிக்கெட் சரிபார்ப்பு (Gate Staff)</h3>
@@ -239,6 +269,79 @@
       closeModal();
     }
 
+    // Switch between Login and Register
+    function switchAuthTab(tab) {
+      document.getElementById("mgrLoginForm").style.display = (tab === 'login') ? 'block' : 'none';
+      document.getElementById("mgrRegisterForm").style.display = (tab === 'register') ? 'block' : 'none';
+
+      document.getElementById("authLoginTab").classList.toggle("active", tab === 'login');
+      document.getElementById("authRegTab").classList.toggle("active", tab === 'register');
+    }
+
+    // மேனேஜர் பதிவு செய்தல் (Registration)
+    function registerNewTheatre() {
+      const name = document.getElementById("regTheatreName").value.trim();
+      const city = document.getElementById("regCity").value;
+      const phone = document.getElementById("regPhone").value.trim();
+      const pass = document.getElementById("regPass").value.trim();
+
+      if (!name || !phone || !pass) {
+        alert("தயவுசெய்து அனைத்து விவரங்களையும் நிரப்பவும்!");
+        return;
+      }
+
+      // மொபைலில் சேமித்தல் (Local Storage)
+      const theatreData = { name, city, phone, pass };
+      localStorage.setItem("thiraipass_theatre_" + phone, JSON.stringify(theatreData));
+
+      alert(`🎉 வாழ்த்துகள்! ${name} வெற்றிகரமாகப் பதிவு செய்யப்பட்டது.`);
+      openManagerDashboard(`${name} (${city})`);
+    }
+
+    // மேனேஜர் உள்நுழைவு (Login)
+    function loginManager() {
+      const phone = document.getElementById("mgrPhone").value.trim();
+      const pass = document.getElementById("mgrPass").value.trim();
+
+      if (!phone || !pass) {
+        alert("மொபைல் எண் மற்றும் அட்மின் கோட் உள்ளிடவும்!");
+        return;
+      }
+
+      // பதிவு செய்யப்பட்ட தியேட்டர் உள்ளதா என சரிபார்த்தல்
+      const saved = localStorage.getItem("thiraipass_theatre_" + phone);
+      if (saved) {
+        const theatre = JSON.parse(saved);
+        if (theatre.pass === pass) {
+          openManagerDashboard(`${theatre.name} (${theatre.city})`);
+          return;
+        } else {
+          alert("தவறான அட்மின் கோட்!");
+          return;
+        }
+      }
+
+      // இயல்புநிலை டெமோ கோட் (TPADMIN2026)
+      if (pass === "TPADMIN2026") {
+        openManagerDashboard("ராம் முத்துராம் சினிமாஸ் (திருநெல்வேலி)");
+      } else {
+        alert("தவறான அட்மின் கோட்! நீங்கள் பதிவு செய்த கோட் அல்லது TPADMIN2026 உள்ளிடவும்.");
+      }
+    }
+
+    function openManagerDashboard(theatreTitle) {
+      document.getElementById("mgrAuthBox").style.display = "none";
+      document.getElementById("mgrDashboard").style.display = "block";
+      document.getElementById("mgrTheatreDisplay").innerText = theatreTitle + " - இன்றைய வசூல்";
+      renderShows();
+    }
+
+    function logoutManager() {
+      document.getElementById("mgrAuthBox").style.display = "block";
+      document.getElementById("mgrDashboard").style.display = "none";
+    }
+
+    // Customer View & Movies Logic
     const cityTheatres = {
       "Tirunelveli": [
         { name: "ராம் முத்துராம் சினிமாஸ் (Ram Muthuram)", loc: "வண்ணார்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:30 PM", "10:15 PM"] },
@@ -387,27 +490,11 @@
       document.getElementById("checkoutBar").style.display = "none";
     }
 
-    // Manager Functions
+    // Manager Shows
     let currentShows = [
       { id: 1, movie: "அமரன்", screen: "Screen 1", time: "10:30 AM", price: "₹190" },
       { id: 2, movie: "GOAT", screen: "Screen 2", time: "06:30 PM", price: "₹190" }
     ];
-
-    function loginManager() {
-      const code = document.getElementById("mgrPass").value.trim();
-      if (code === "TPADMIN2026") {
-        document.getElementById("mgrLoginCard").style.display = "none";
-        document.getElementById("mgrDashboard").style.display = "block";
-        renderShows();
-      } else {
-        alert("தவறான அட்மின் கோட்! TPADMIN2026 என உள்ளிடவும்.");
-      }
-    }
-
-    function logoutManager() {
-      document.getElementById("mgrLoginCard").style.display = "block";
-      document.getElementById("mgrDashboard").style.display = "none";
-    }
 
     function renderShows() {
       const container = document.getElementById("activeShowsList");
@@ -433,7 +520,7 @@
 
       currentShows.unshift({ id: Date.now(), movie, screen, time, price });
       renderShows();
-      alert(`🎉 ${movie} காட்சி நேரலையில் ஏற்றப்பட்டது!`);
+      alert(`🎉 ${movie} காட்சி வெற்றிகரமாகச் சேர்க்கப்பட்டது!`);
     }
 
     function deleteShow(id) {
@@ -441,7 +528,6 @@
       renderShows();
     }
 
-    // Gate Ticket Verify
     function verifyGateTicket() {
       const id = document.getElementById("gateBookingInput").value.trim().toUpperCase();
       const res = document.getElementById("gateResult");
