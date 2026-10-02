@@ -3,39 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThiraiPass - நேரலை திரைப்பட முன்பதிவு</title>
+  <title>ThiraiPass - திரைப்பட முன்பதிவு & அட்மின் தளம்</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; padding-bottom: 80px; }
+    body { background-color: #0b1329; color: #f8fafc; padding-bottom: 80px; }
     
     /* Header */
-    header { background: #1e293b; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
+    header { background: #1e293b; padding: 12px 16px; border-bottom: 2px solid #ef4444; position: sticky; top: 0; z-index: 20; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
     .logo { font-size: 20px; font-weight: bold; color: #ef4444; }
-    .city-select { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; outline: none; }
+    .city-select { background: #0f172a; color: #38bdf8; border: 1px solid #475569; padding: 6px 10px; border-radius: 16px; font-size: 12px; font-weight: bold; outline: none; }
 
-    /* Location Bar */
-    .container { padding: 16px; }
-    .location-banner { background: #1e293b; padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #22c55e; }
-    .detect-btn { background: #22c55e; color: #0f172a; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    /* Navigation Bar (Tabs) - 404 Error வரவே வராது */
+    .nav-tabs { display: flex; background: #0f172a; border-radius: 8px; margin-top: 10px; padding: 4px; gap: 4px; }
+    .nav-tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: bold; color: #94a3b8; border-radius: 6px; cursor: pointer; border: none; background: transparent; }
+    .nav-tab.active { background: #ef4444; color: white; }
 
-    h2 { font-size: 17px; margin-bottom: 12px; color: #e2e8f0; }
-    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+    .container { padding: 16px; max-width: 500px; margin: 0 auto; }
+    .card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155; }
+    h3 { font-size: 16px; margin-bottom: 12px; color: #38bdf8; }
+
+    /* Common Form Styles */
+    label { font-size: 13px; color: #94a3b8; display: block; margin-top: 10px; margin-bottom: 4px; }
+    input, select { width: 100%; background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: #38bdf8; }
+    .btn-primary { background: #ef4444; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 16px; cursor: pointer; }
+    .btn-green { background: #22c55e; color: #000; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 16px; cursor: pointer; }
+
+    /* Customer View */
+    .location-banner { background: #1e293b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #22c55e; }
+    .detect-btn { background: #22c55e; color: #0f172a; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .movie-card { background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155; cursor: pointer; }
-    .movie-card img { width: 100%; height: 210px; object-fit: cover; }
+    .movie-card img { width: 100%; height: 200px; object-fit: cover; }
     .movie-info { padding: 10px; }
-    .movie-title { font-size: 15px; font-weight: 600; }
+    .movie-title { font-size: 14px; font-weight: 600; }
     .movie-meta { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
     /* Modal Sheet */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20; justify-content: flex-end; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 30; justify-content: flex-end; }
     .modal-content { background: #1e293b; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; padding: 20px; overflow-y: auto; }
     .close-btn { float: right; font-size: 22px; cursor: pointer; color: #94a3b8; }
-    
     .theatre-card { background: #0f172a; padding: 14px; border-radius: 10px; margin-top: 12px; border: 1px solid #334155; }
     .show-btn { background: #334155; border: 1px solid #22c55e; color: #22c55e; padding: 6px 14px; border-radius: 6px; margin: 8px 6px 0 0; font-size: 13px; font-weight: bold; cursor: pointer; }
-    .show-btn:hover { background: #22c55e; color: #000; }
 
-    /* Seats Layout */
+    /* Seats */
     .screen-container { margin: 20px 0; text-align: center; }
     .screen { height: 6px; background: #38bdf8; border-radius: 4px; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4); margin-bottom: 20px; }
     .seats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 320px; margin: 0 auto; }
@@ -43,36 +55,142 @@
     .seat.available { background: #334155; color: #f8fafc; border: 1px solid #475569; }
     .seat.selected { background: #22c55e !important; color: #000 !important; }
     .seat.booked { background: #dc2626 !important; color: #7f1d1d !important; cursor: not-allowed; }
-
-    /* Checkout Bar */
-    .checkout-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 14px 20px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+    .checkout-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 14px 20px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; z-index: 25; }
     .book-btn { background: #ef4444; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
-
     .ticket { background: #0f172a; border: 2px dashed #22c55e; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
     .qr-box { margin: 15px auto; width: 120px; height: 120px; background: white; color: black; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+
+    /* Manager Admin & Scanner Styles */
+    .show-item { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #38bdf8; }
+    .del-btn { background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    .revenue-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; }
+    .revenue-amount { font-size: 26px; font-weight: bold; color: #22c55e; margin-top: 6px; }
+    .val-box { margin-top: 16px; padding: 16px; border-radius: 10px; display: none; text-align: center; font-weight: bold; }
+    .val-valid { background: #064e3b; color: #34d399; border: 2px solid #10b981; }
+    .val-invalid { background: #7f1d1d; color: #f87171; border: 2px solid #ef4444; }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <div class="logo">🎟️ ThiraiPass</div>
-    <select class="city-select" id="cityDropdown" onchange="changeCity(this.value)">
-      <option value="Tirunelveli">📍 திருநெல்வேலி</option>
-      <option value="Chennai">📍 சென்னை</option>
-      <option value="Coimbatore">📍 கோயம்புத்தூர்</option>
-      <option value="Madurai">📍 மதுரை</option>
-      <option value="Trichy">📍 திருச்சி</option>
-    </select>
+    <div class="header-top">
+      <div class="logo">🎟️ ThiraiPass</div>
+      <select class="city-select" id="cityDropdown" onchange="changeCity(this.value)">
+        <option value="Tirunelveli">📍 திருநெல்வேலி</option>
+        <option value="Chennai">📍 சென்னை</option>
+        <option value="Coimbatore">📍 கோவை</option>
+        <option value="Madurai">📍 மதுரை</option>
+      </select>
+    </div>
+    
+    <!-- 3 முக்கிய டேப்கள் - நேரடி மாறுதல் -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tabCustomer" onclick="showView('customer')">🎬 படங்கள் (Movies)</button>
+      <button class="nav-tab" id="tabManager" onclick="showView('manager')">👔 மேனேஜர் அட்மின்</button>
+      <button class="nav-tab" id="tabGate" onclick="showView('gate')">🔍 கேட் ஸ்கேனர்</button>
+    </div>
   </header>
 
   <div class="container">
-    <div class="location-banner">
-      <span id="locationText">இருப்பிடம்: திருநெல்வேலி</span>
-      <button class="detect-btn" onclick="detectRealGPS()">📡 GPS கண்டறி</button>
+
+    <!-- ========================================== -->
+    <!-- 1. CUSTOMER VIEW: படங்கள் & இருக்கை முன்பதிவு -->
+    <!-- ========================================== -->
+    <div id="viewCustomer">
+      <div class="location-banner">
+        <span id="locationText">இருப்பிடம்: திருநெல்வேலி</span>
+        <button class="detect-btn" onclick="detectRealGPS()">📡 GPS கண்டறி</button>
+      </div>
+
+      <h2 style="font-size: 16px; margin-bottom: 12px;">சமீபத்திய வெளியீடுகள் (Now Showing)</h2>
+      <div class="movie-grid" id="moviesList"></div>
     </div>
 
-    <h2>சமீபத்திய வெளியீடுகள் (Now Showing)</h2>
-    <div class="movie-grid" id="moviesList"></div>
+    <!-- ========================================== -->
+    <!-- 2. MANAGER VIEW: மேனேஜர் அட்மின் பலகை -->
+    <!-- ========================================== -->
+    <div id="viewManager" style="display:none;">
+      
+      <!-- Manager Login -->
+      <div id="mgrLoginCard" class="card">
+        <h3>👔 திரையரங்கு மேனேஜர் உள்நுழைவு</h3>
+        <label>மேனேஜர் மொபைல் எண்:</label>
+        <input type="tel" id="mgrPhone" value="9876543210">
+
+        <label>மேனேஜர் அட்மின் கோட் (Admin Passcode):</label>
+        <input type="password" id="mgrPass" value="TPADMIN2026">
+        <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">சோதனை அட்மின் கோட்: <strong>TPADMIN2026</strong></small>
+
+        <button class="btn-primary" onclick="loginManager()">மேலாண்மைத் திரையைத் திற</button>
+      </div>
+
+      <!-- Manager Dashboard (After Login) -->
+      <div id="mgrDashboard" style="display:none;">
+        <div class="revenue-card">
+          <span style="font-size: 13px; color: #94a3b8;">ராம் முத்துராம் சினிமாஸ் - இன்றைய வசூல்</span>
+          <div class="revenue-amount">₹3,420</div>
+          <small style="color: #38bdf8;">18 டிக்கெட்டுகள் விற்கப்பட்டுள்ளன</small>
+        </div>
+
+        <div class="card">
+          <h3>➕ புதிய காட்சிகளைச் சேர்க்க (Add Show)</h3>
+          <label>திரைப்படம்:</label>
+          <select id="newShowMovie">
+            <option value="அமரன் (Amaran)">அமரன் (Amaran)</option>
+            <option value="GOAT">GOAT</option>
+            <option value="லியோ (Leo)">லியோ (Leo)</option>
+          </select>
+
+          <label>திரை (Screen):</label>
+          <select id="newShowScreen">
+            <option value="Screen 1 (RGB Laser)">Screen 1 (RGB Laser)</option>
+            <option value="Screen 2 (Dolby Atmos)">Screen 2 (Dolby Atmos)</option>
+          </select>
+
+          <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+              <label>காட்சி நேரம்:</label>
+              <input type="text" id="newShowTime" value="10:30 AM">
+            </div>
+            <div style="flex: 1;">
+              <label>டிக்கெட் விலை (₹):</label>
+              <input type="number" id="newShowPrice" value="190">
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="addNewShow()">காட்சியை நேரலையில் ஏற்று</button>
+        </div>
+
+        <div class="card">
+          <h3>🎬 எங்கள் தியேட்டர் காட்சிகள்</h3>
+          <div id="activeShowsList"></div>
+        </div>
+
+        <button class="btn-primary" style="background:#334155; color:#f87171;" onclick="logoutManager()">மேனேஜர் கணக்கிலிருந்து வெளியேறு</button>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. GATE STAFF VIEW: டிக்கெட் ஸ்கேனர் & சரிபார்ப்பு -->
+    <!-- ========================================== -->
+    <div id="viewGate" style="display:none;">
+      <div class="card">
+        <h3>🔍 கேட் டிக்கெட் சரிபார்ப்பு (Gate Staff)</h3>
+        <label>ரசிகரின் Booking ID-ஐ உள்ளிடவும்:</label>
+        <input type="text" id="gateBookingInput" placeholder="TP..." style="font-size: 20px; text-align: center; text-transform: uppercase;">
+        <button class="btn-green" onclick="verifyGateTicket()">சரிபார் (VERIFY)</button>
+        <div id="gateResult" class="val-box"></div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size: 13px; color:#94a3b8; margin-bottom:8px;">சமீபத்தில் அனுமதிக்கப்பட்டவர்கள்:</h4>
+        <div style="font-size: 13px; color: #22c55e;">• TP847291 - அமரன் (A4, A5) - அனுமதிக்கப்பட்டது</div>
+        <div style="font-size: 13px; color: #22c55e; margin-top:6px;">• TP392811 - GOAT (B1, B2) - அனுமதிக்கப்பட்டது</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Booking Modal -->
@@ -109,29 +227,33 @@
   </div>
 
   <script>
-    // ஊர் வாரியான உள்ளூர் தியேட்டர்கள் (Local Theatres)
+    // Tab Navigation
+    function showView(view) {
+      document.getElementById("viewCustomer").style.display = (view === 'customer') ? 'block' : 'none';
+      document.getElementById("viewManager").style.display = (view === 'manager') ? 'block' : 'none';
+      document.getElementById("viewGate").style.display = (view === 'gate') ? 'block' : 'none';
+
+      document.getElementById("tabCustomer").classList.toggle("active", view === 'customer');
+      document.getElementById("tabManager").classList.toggle("active", view === 'manager');
+      document.getElementById("tabGate").classList.toggle("active", view === 'gate');
+      closeModal();
+    }
+
     const cityTheatres = {
       "Tirunelveli": [
         { name: "ராம் முத்துராம் சினிமாஸ் (Ram Muthuram)", loc: "வண்ணார்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:30 PM", "10:15 PM"] },
         { name: "பெரின்ப விலாஸ் (PV Multiplex)", loc: "திருநெல்வேலி ஜங்ஷன்", shows: ["11:00 AM", "02:45 PM", "06:45 PM", "10:00 PM"] },
-        { name: "ரத்னா தியேட்டர் (Ratna Multiplex)", loc: "வண்ணார்பேட்டை", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] },
-        { name: "பாம்பே தியேட்டர்", loc: "சந்திப்பு ரோடு", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
+        { name: "ரத்னா தியேட்டர் (Ratna Multiplex)", loc: "வண்ணார்பேட்டை", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] }
       ],
       "Chennai": [
         { name: "SPI Cinemas (சத்யம்)", loc: "ராயப்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:45 PM"] },
-        { name: "ரோகிணி சில்வர் ஸ்கிரீன்ஸ்", loc: "கோயம்பேடு", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
-        { name: "வெற்றி சினிமாஸ்", loc: "குரோம்பேட்டை", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
+        { name: "ரோகிணி சில்வர் ஸ்கிரீன்ஸ்", loc: "கோயம்பேடு", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] }
       ],
       "Coimbatore": [
-        { name: "Broadway Cinemas", loc: "அவினாசி ரோடு", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] },
-        { name: "KG Cinemas", loc: "ரேஸ்கோர்ஸ்", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
+        { name: "Broadway Cinemas", loc: "அவினாசி ரோடு", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] }
       ],
       "Madurai": [
-        { name: "Vetri Cinemas", loc: "வில்லாபுரம்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
-        { name: "Gopuram Cinemas", loc: "பெரியார்", shows: ["10:30 AM", "02:00 PM", "06:00 PM"] }
-      ],
-      "Trichy": [
-        { name: "LA Cinemas", loc: "தில்லை நகர்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] }
+        { name: "Vetri Cinemas", loc: "வில்லாபுரம்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] }
       ]
     };
 
@@ -146,60 +268,6 @@
     let selectedMovie = null;
     let selectedSeats = [];
     const ticketPrice = 190;
-
-    // உண்மையான GPS சாட்டிலைட் மூலம் இருப்பிடம் அறிதல்
-    async function detectRealGPS() {
-      const locText = document.getElementById("locationText");
-      locText.innerText = "GPS செயற்கைக்கோள் தேடுகிறது...";
-
-      if (!navigator.geolocation) {
-        locText.innerText = "GPS வசதி உங்கள் பிரவுசரில் இல்லை.";
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          locText.innerText = "ஊர் கண்டறியப்படுகிறது...";
-
-          try {
-            // இலவச ரிவர்ஸ் ஜியோகோடிங் API
-            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-            const data = await response.json();
-            
-            // நகரம் அல்லது மாவட்டத்தைக் கண்டறிதல்
-            let detectedCity = data.city || data.locality || data.principalSubdivision;
-
-            if (data.city && data.city.includes("Tirunelveli")) {
-              detectedCity = "Tirunelveli";
-            } else if (data.locality && data.locality.includes("Tirunelveli")) {
-              detectedCity = "Tirunelveli";
-            }
-
-            locText.innerText = `இருப்பிடம்: ${detectedCity} (GPS உறுதிசெய்யப்பட்டது ✅)`;
-            
-            // பட்டியலில் இருந்தால் அந்த ஊரை மாற்றுதல்
-            if (cityTheatres[detectedCity]) {
-              changeCity(detectedCity);
-              document.getElementById("cityDropdown").value = detectedCity;
-            } else {
-              // திருநெல்வேலிக்கு தானாக மாற்றுதல்
-              changeCity("Tirunelveli");
-              document.getElementById("cityDropdown").value = "Tirunelveli";
-            }
-          } catch (e) {
-            locText.innerText = "இருப்பிடம்: திருநெல்வேலி (இயல்புநிலை)";
-            changeCity("Tirunelveli");
-          }
-        },
-        (error) => {
-          locText.innerText = "GPS அனுமதி மறுக்கப்பட்டது. திருநெல்வேலி வைக்கப்பட்டுள்ளது.";
-          changeCity("Tirunelveli");
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
 
     function changeCity(city) {
       currentCity = city;
@@ -319,8 +387,81 @@
       document.getElementById("checkoutBar").style.display = "none";
     }
 
+    // Manager Functions
+    let currentShows = [
+      { id: 1, movie: "அமரன்", screen: "Screen 1", time: "10:30 AM", price: "₹190" },
+      { id: 2, movie: "GOAT", screen: "Screen 2", time: "06:30 PM", price: "₹190" }
+    ];
+
+    function loginManager() {
+      const code = document.getElementById("mgrPass").value.trim();
+      if (code === "TPADMIN2026") {
+        document.getElementById("mgrLoginCard").style.display = "none";
+        document.getElementById("mgrDashboard").style.display = "block";
+        renderShows();
+      } else {
+        alert("தவறான அட்மின் கோட்! TPADMIN2026 என உள்ளிடவும்.");
+      }
+    }
+
+    function logoutManager() {
+      document.getElementById("mgrLoginCard").style.display = "block";
+      document.getElementById("mgrDashboard").style.display = "none";
+    }
+
+    function renderShows() {
+      const container = document.getElementById("activeShowsList");
+      container.innerHTML = "";
+      currentShows.forEach(s => {
+        container.innerHTML += `
+          <div class="show-item">
+            <div>
+              <strong>${s.movie}</strong> • <small style="color:#38bdf8;">${s.time}</small><br>
+              <small style="color:#94a3b8;">${s.screen} | ${s.price}</small>
+            </div>
+            <button class="del-btn" onclick="deleteShow(${s.id})">நீக்கு</button>
+          </div>
+        `;
+      });
+    }
+
+    function addNewShow() {
+      const movie = document.getElementById("newShowMovie").value;
+      const screen = document.getElementById("newShowScreen").value;
+      const time = document.getElementById("newShowTime").value;
+      const price = "₹" + document.getElementById("newShowPrice").value;
+
+      currentShows.unshift({ id: Date.now(), movie, screen, time, price });
+      renderShows();
+      alert(`🎉 ${movie} காட்சி நேரலையில் ஏற்றப்பட்டது!`);
+    }
+
+    function deleteShow(id) {
+      currentShows = currentShows.filter(s => s.id !== id);
+      renderShows();
+    }
+
+    // Gate Ticket Verify
+    function verifyGateTicket() {
+      const id = document.getElementById("gateBookingInput").value.trim().toUpperCase();
+      const res = document.getElementById("gateResult");
+      res.style.display = "block";
+
+      if (!id) {
+        alert("Booking ID உள்ளிடவும்!");
+        return;
+      }
+
+      if (id.startsWith("TP")) {
+        res.className = "val-box val-valid";
+        res.innerHTML = `✅ செல்லுபடியாகும் டிக்கெட்!<br>படம்: அமரன் (அனுமதிக்கலாம்)`;
+      } else {
+        res.className = "val-box val-invalid";
+        res.innerHTML = `❌ தவறான டிக்கெட் எண்!`;
+      }
+    }
+
     loadMovies();
-    detectRealGPS();
   </script>
 </body>
 </html>
