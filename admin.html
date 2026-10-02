@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThiraiPass - திரையரங்கு நிர்வாகப் பலகை (Partner Portal)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0b1329; color: #f1f5f9; padding-bottom: 50px; }
+
+    /* Header */
+    header { background: #1e293b; padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ef4444; }
+    .logo { font-size: 18px; font-weight: bold; color: #fff; }
+    .badge { background: #ef4444; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-left: 6px; }
+    .theatre-badge { font-size: 13px; color: #38bdf8; background: #0f172a; padding: 6px 12px; border-radius: 8px; border: 1px solid #334155; }
+
+    .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+    
+    /* Cards */
+    .card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+    h3 { font-size: 16px; margin-bottom: 14px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    
+    /* Forms */
+    label { font-size: 13px; color: #94a3b8; display: block; margin-top: 10px; margin-bottom: 4px; }
+    input, select { width: 100%; background: #0f172a; border: 1px solid #475569; color: white; padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: #38bdf8; }
+    
+    .btn-primary { background: #ef4444; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 16px; cursor: pointer; }
+    .btn-verify { background: #22c55e; color: #000; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+
+    /* Tables & Lists */
+    .show-item { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #38bdf8; }
+    .del-btn { background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    
+    .booking-row { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 8px; border-left: 4px solid #22c55e; font-size: 13px; }
+    
+    /* Ticket Validator Result */
+    .val-box { margin-top: 12px; padding: 12px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+    .val-valid { background: #064e3b; color: #34d399; border: 1px solid #059669; }
+    .val-invalid { background: #7f1d1d; color: #f87171; border: 1px solid #dc2626; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🎟️ ThiraiPass <span class="badge">THEATRE PORTAL</span></div>
+    <div class="theatre-badge" id="activeTheatreTitle">ராம் முத்துராம் சினிமாஸ்</div>
+  </header>
+
+  <div class="container">
+
+    <!-- 1. தியேட்டர் தேர்வு -->
+    <div class="card">
+      <h3>🏢 திரையரங்கு சுயவிவரம்</h3>
+      <label>நிர்வகிக்கும் திரையரங்கம்:</label>
+      <select id="theatreSelect" onchange="updateTheatreProfile(this.value)">
+        <option value="ராம் முத்துராம் சினிமாஸ் (திருநெல்வேலி)">ராம் முத்துராம் சினிமாஸ் (திருநெல்வேலி)</option>
+        <option value="பெரின்ப விலாஸ் (திருநெல்வேலி)">பெரின்ப விலாஸ் (திருநெல்வேலி)</option>
+        <option value="சத்யம் சினிமாஸ் (சென்னை)">சத்யம் சினிமாஸ் (சென்னை)</option>
+        <option value="ரோகிணி சில்வர் ஸ்கிரீன்ஸ் (சென்னை)">ரோகிணி சில்வர் ஸ்கிரீன்ஸ் (சென்னை)</option>
+      </select>
+    </div>
+
+    <!-- 2. புதிய காட்சி சேர்த்தல் -->
+    <div class="card">
+      <h3>➕ புதிய காட்சிகளைச் சேர்க்க (Add Show)</h3>
+      
+      <label>திரைப்படம்:</label>
+      <select id="newShowMovie">
+        <option value="அமரன் (Amaran)">அமரன் (Amaran)</option>
+        <option value="GOAT">GOAT</option>
+        <option value="லியோ (Leo)">லியோ (Leo)</option>
+        <option value="ஜெயிலர் (Jailer)">ஜெயிலர் (Jailer)</option>
+      </select>
+
+      <label>திரை எண் (Screen):</label>
+      <select id="newShowScreen">
+        <option value="Screen 1 (RGB Laser)">Screen 1 (RGB Laser)</option>
+        <option value="Screen 2 (Dolby Atmos)">Screen 2 (Dolby Atmos)</option>
+        <option value="Audi 3">Audi 3</option>
+      </select>
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+          <label>காட்சி நேரம்:</label>
+          <input type="text" id="newShowTime" value="10:30 AM" placeholder="10:30 AM">
+        </div>
+        <div style="flex: 1;">
+          <label>டிக்கெட் விலை (₹):</label>
+          <input type="number" id="newShowPrice" value="190">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="addNewShow()">காட்சியை நேரலையில் ஏற்று</button>
+    </div>
+
+    <!-- 3. தற்போது ஓடும் காட்சிகள் -->
+    <div class="card">
+      <h3>🎬 நேரலை காட்சிகள் (Active Shows)</h3>
+      <div id="activeShowsList"></div>
+    </div>
+
+    <!-- 4. வாசலில் நிற்கும் ரசிகர்களின் டிக்கெட்டை சரிபார்க்கும் கருவி -->
+    <div class="card">
+      <h3>🔍 கேட் டிக்கெட் சரிபார்ப்பு (Ticket Gate Check)</h3>
+      <label>ரசிகரின் Booking ID-ஐ உள்ளிடவும்:</label>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="verifyBookingInput" placeholder="எ.கா: TP549812">
+        <button class="btn-verify" onclick="verifyTicket()">சரிபார்</button>
+      </div>
+      <div id="validationResult" class="val-box"></div>
+    </div>
+
+    <!-- 5. நேரலை முன்பதிவு பட்டியல் -->
+    <div class="card">
+      <h3>📊 சமீபத்திய முன்பதிவுகள் (Live Bookings)</h3>
+      <div id="bookingsList">
+        <div class="booking-row">
+          <strong>Booking ID: TP847291</strong><br>
+          படம்: அமரன் • இருக்கைகள்: A4, A5<br>
+          <span style="color:#22c55e; font-weight:bold;">₹380 - PAID (Online)</span> • <small style="color:#94a3b8;">11:42 AM</small>
+        </div>
+        <div class="booking-row">
+          <strong>Booking ID: TP392811</strong><br>
+          படம்: GOAT • இருக்கைகள்: B1, B2, B3<br>
+          <span style="color:#22c55e; font-weight:bold;">₹570 - PAID (Online)</span> • <small style="color:#94a3b8;">11:15 AM</small>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // மாதிரி காட்சிகள் பட்டியல்
+    let currentShows = [
+      { id: 1, movie: "அமரன்", screen: "Screen 1", time: "10:30 AM", price: "₹190" },
+      { id: 2, movie: "அமரன்", screen: "Screen 1", time: "02:15 PM", price: "₹190" },
+      { id: 3, movie: "GOAT", screen: "Screen 2", time: "06:30 PM", price: "₹190" },
+      { id: 4, movie: "லியோ", screen: "Screen 1", time: "10:15 PM", price: "₹150" }
+    ];
+
+    function updateTheatreProfile(name) {
+      document.getElementById("activeTheatreTitle").innerText = name;
+      alert(`${name} மேலாண்மைத் திரை திறக்கப்பட்டது!`);
+    }
+
+    function renderShows() {
+      const container = document.getElementById("activeShowsList");
+      container.innerHTML = "";
+      currentShows.forEach(s => {
+        container.innerHTML += `
+          <div class="show-item">
+            <div>
+              <strong>${s.movie}</strong> • <small style="color:#38bdf8;">${s.time}</small><br>
+              <small style="color:#94a3b8;">${s.screen} | ${s.price}</small>
+            </div>
+            <button class="del-btn" onclick="deleteShow(${s.id})">நீக்கு</button>
+          </div>
+        `;
+      });
+    }
+
+    function addNewShow() {
+      const movie = document.getElementById("newShowMovie").value;
+      const screen = document.getElementById("newShowScreen").value;
+      const time = document.getElementById("newShowTime").value;
+      const price = "₹" + document.getElementById("newShowPrice").value;
+
+      const newId = currentShows.length + 1;
+      currentShows.unshift({ id: newId, movie, screen, time, price });
+      renderShows();
+      alert(`🎉 ${movie} - ${time} காட்சி வெற்றிகரமாக ஆப்பில் சேர்க்கப்பட்டது!`);
+    }
+
+    function deleteShow(id) {
+      currentShows = currentShows.filter(s => s.id !== id);
+      renderShows();
+    }
+
+    // டிக்கெட் சரிபார்ப்பு
+    function verifyTicket() {
+      const id = document.getElementById("verifyBookingInput").value.trim().toUpperCase();
+      const res = document.getElementById("validationResult");
+      res.style.display = "block";
+
+      if (!id) {
+        alert("தயவுசெய்து Booking ID உள்ளிடவும்!");
+        return;
+      }
+
+      // சோதனை உதாரணம்
+      if (id.startsWith("TP")) {
+        res.className = "val-box val-valid";
+        res.innerHTML = `✅ செல்லுபடியாகும் டிக்கெட்!<br>படம்: அமரன் | இருக்கை: A4, A5 (அனுமதிக்கலாம்)`;
+      } else {
+        res.className = "val-box val-invalid";
+        res.innerHTML = `❌ தவறான டிக்கெட் எண்! முன்பதிவு கிடைக்கவில்லை.`;
+      }
+    }
+
+    renderShows();
+  </script>
+</body>
+</html>
