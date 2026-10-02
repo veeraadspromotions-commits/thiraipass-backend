@@ -3,36 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThiraiPass - திரைப்பட முன்பதிவு</title>
+  <title>ThiraiPass - நேரலை திரைப்பட முன்பதிவு</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding-bottom: 80px; }
     
     /* Header */
-    header { background: #1e293b; padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
+    header { background: #1e293b; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
     .logo { font-size: 20px; font-weight: bold; color: #ef4444; }
-    .location { font-size: 13px; color: #94a3b8; background: #334155; padding: 4px 10px; rounded: 12px; border-radius: 12px; }
+    .city-select { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; outline: none; }
 
-    /* Movie Cards */
+    /* Container */
     .container { padding: 16px; }
-    h2 { font-size: 18px; margin-bottom: 12px; color: #e2e8f0; }
+    .location-banner { background: #1e293b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #38bdf8; }
+    .detect-btn { background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+    h2 { font-size: 17px; margin-bottom: 12px; color: #e2e8f0; }
     .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    .movie-card { background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155; cursor: pointer; transition: 0.2s; }
-    .movie-card:hover { transform: scale(1.02); }
+    .movie-card { background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155; cursor: pointer; }
     .movie-card img { width: 100%; height: 210px; object-fit: cover; }
     .movie-info { padding: 10px; }
     .movie-title { font-size: 15px; font-weight: 600; }
     .movie-meta { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
-    /* Modal Sheet for Theatres & Shows */
+    /* Modal Sheet */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20; justify-content: flex-end; }
     .modal-content { background: #1e293b; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; padding: 20px; overflow-y: auto; }
     .close-btn { float: right; font-size: 20px; cursor: pointer; color: #94a3b8; }
     
     .theatre-card { background: #0f172a; padding: 14px; border-radius: 10px; margin-top: 12px; border: 1px solid #334155; }
     .show-btn { background: #334155; border: 1px solid #22c55e; color: #22c55e; padding: 6px 14px; border-radius: 6px; margin: 8px 6px 0 0; font-size: 13px; font-weight: bold; cursor: pointer; }
-    .show-btn:hover { background: #22c55e; color: #0f172a; }
-
+    
     /* Screen & Seats */
     .screen-container { margin: 20px 0; text-align: center; }
     .screen { height: 6px; background: #38bdf8; border-radius: 4px; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4); margin-bottom: 20px; }
@@ -42,11 +43,10 @@
     .seat.selected { background: #22c55e !important; color: #000 !important; }
     .seat.booked { background: #dc2626 !important; color: #7f1d1d !important; cursor: not-allowed; }
 
-    /* Booking Summary Bar */
+    /* Checkout Bar */
     .checkout-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; padding: 14px 20px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
     .book-btn { background: #ef4444; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
 
-    /* Ticket Box */
     .ticket { background: #0f172a; border: 2px dashed #22c55e; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
     .qr-box { margin: 15px auto; width: 120px; height: 120px; background: white; color: black; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
   </style>
@@ -55,23 +55,33 @@
 
   <header>
     <div class="logo">🎟️ ThiraiPass</div>
-    <div class="location">📍 சென்னை</div>
+    <select class="city-select" id="cityDropdown" onchange="changeCity(this.value)">
+      <option value="Chennai">📍 சென்னை</option>
+      <option value="Coimbatore">📍 கோயம்புத்தூர்</option>
+      <option value="Madurai">📍 மதுரை</option>
+      <option value="Trichy">📍 திருச்சி</option>
+    </select>
   </header>
 
   <div class="container">
-    <h2>இப்போது திரையரங்குகளில் (Now Showing)</h2>
+    <div class="location-banner">
+      <span id="locationText">இருப்பிடம்: சென்னை (தானியங்கி)</span>
+      <button class="detect-btn" onclick="detectGPS()">GPS கண்டறி</button>
+    </div>
+
+    <h2>சமீபத்திய வெளியீடுகள் (Now Showing)</h2>
     <div class="movie-grid" id="moviesList"></div>
   </div>
 
-  <!-- Theatre & Seat Booking Modal -->
+  <!-- Booking Modal -->
   <div class="modal" id="bookingModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">✕</span>
-      <h3 id="modalMovieTitle">திரைப்பட விவரம்</h3>
+      <h3 id="modalMovieTitle">திரைப்படம்</h3>
       <p id="modalMovieMeta" style="color:#94a3b8; font-size: 13px; margin-bottom: 12px;"></p>
 
       <div id="theatreSection">
-        <h4 style="margin-top:10px;">திரையரங்குகள் & காட்சி நேரங்கள்:</h4>
+        <h4 style="margin-top:10px;">அருகில் உள்ள திரையரங்குகள்:</h4>
         <div id="theatresList"></div>
       </div>
 
@@ -79,7 +89,7 @@
         <h4>இருக்கையைத் தேர்ந்தெடுக்கவும்:</h4>
         <div class="screen-container">
           <div class="screen"></div>
-          <small style="color: #64748b;">திரை (Screen)</small>
+          <small style="color: #64748b;">திரை (Screen நோக்கி)</small>
         </div>
         <div class="seats-grid" id="seatsGrid"></div>
       </div>
@@ -88,35 +98,82 @@
     </div>
   </div>
 
-  <!-- Bottom Checkout Bar -->
   <div class="checkout-bar" id="checkoutBar" style="display:none;">
     <div>
-      <div style="font-size: 12px; color: #94a3b8;">தேர்வு செய்த இருக்கைகள்: <span id="selectedSeatsLabel" style="color:#fff;">0</span></div>
+      <div style="font-size: 12px; color: #94a3b8;">இருக்கைகள்: <span id="selectedSeatsLabel" style="color:#fff;">0</span></div>
       <div style="font-size: 16px; font-weight: bold; color: #22c55e;">₹<span id="totalAmount">0</span></div>
     </div>
     <button class="book-btn" onclick="confirmBooking()">முன்பதிவு செய்</button>
   </div>
 
   <script>
-    // உங்கள் Render நேரலை API URL-ஐ இங்கு மாற்றிக் கொள்ளலாம்
-    // Local / Default Mock fallback
-    const API_BASE = "http://localhost:5000/api"; 
+    // ஊர் வாரியான திரையரங்குகள் தரவு (Local Theatres Data)
+    const cityTheatres = {
+      "Chennai": [
+        { name: "SPI Cinemas (சத்யம்)", loc: "ராயப்பேட்டை", shows: ["10:30 AM", "02:15 PM", "06:45 PM", "10:00 PM"] },
+        { name: "ரோகிணி சில்வர் ஸ்கிரீன்ஸ்", loc: "கோயம்பேடு", shows: ["11:00 AM", "02:30 PM", "06:30 PM", "10:15 PM"] },
+        { name: "PVR VR Mall", loc: "அண்ணா நகர்", shows: ["01:15 PM", "04:45 PM", "08:00 PM"] },
+        { name: "வெற்றி சினிமாஸ்", loc: "குரோம்பேட்டை", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] }
+      ],
+      "Coimbatore": [
+        { name: "Broadway Cinemas", loc: "அவினாசி ரோடு", shows: ["10:45 AM", "02:30 PM", "06:15 PM"] },
+        { name: "KG Cinemas", loc: "ரேஸ்கோர்ஸ்", shows: ["11:30 AM", "03:00 PM", "06:45 PM"] },
+        { name: "INOX Prozone Mall", loc: "சரவணம்பட்டி", shows: ["01:00 PM", "05:00 PM", "09:00 PM"] }
+      ],
+      "Madurai": [
+        { name: "Vetri Cinemas", loc: "வில்லாபுரம்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
+        { name: "Gopuram Cinemas", loc: "பெரியார் பேருந்து நிலையம்", shows: ["10:30 AM", "02:00 PM", "06:00 PM"] }
+      ],
+      "Trichy": [
+        { name: "LA Cinemas (Maris)", loc: "தில்லை நகர்", shows: ["11:00 AM", "02:30 PM", "06:30 PM"] },
+        { name: "Mega Star Cinemas", loc: "மத்திய பேருந்து நிலையம்", shows: ["10:30 AM", "02:15 PM", "06:45 PM"] }
+      ]
+    };
 
-    // மாதிரி படங்கள் (API கிடைக்காத போதும் இயங்கும்)
-    const fallbackMovies = [
-      { id: 1, title: "லியோ (Leo)", language: "தமிழ்", genre: "Action", duration: "2h 44m", poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
-      { id: 2, title: "ஜெயிலர் (Jailer)", language: "தமிழ்", genre: "Mass Action", duration: "2h 48m", poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500" }
+    // சமீபத்திய படங்கள் (Latest Movies)
+    const latestMovies = [
+      { id: 1, title: "லியோ (Leo)", language: "தமிழ்", genre: "Action / Thriller", duration: "2h 44m", poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
+      { id: 2, title: "ஜெயிலர் (Jailer)", language: "தமிழ்", genre: "Action / Drama", duration: "2h 48m", poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500" },
+      { id: 3, title: "அமரன் (Amaran)", language: "தமிழ்", genre: "Biographical Action", duration: "2h 49m", poster: "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=500" },
+      { id: 4, title: "GOAT", language: "தமிழ்", genre: "Sci-Fi Action", duration: "3h 03m", poster: "https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=500" }
     ];
 
+    let currentCity = "Chennai";
     let selectedMovie = null;
     let selectedSeats = [];
     const ticketPrice = 190;
 
-    // திரைப்படங்களைப் பட்டியலிடுதல்
+    // GPS இருப்பிடம் கண்டறிதல்
+    function detectGPS() {
+      const locText = document.getElementById("locationText");
+      locText.innerText = "GPS தேடப்படுகிறது...";
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            // மாதிரி: தமிழ்நாட்டில் இருந்தால் தானாக சென்னைக்கு செட் ஆகும்
+            locText.innerText = "இருப்பிடம்: சென்னை (GPS உறுதிசெய்யப்பட்டது ✅)";
+            document.getElementById("cityDropdown").value = "Chennai";
+            changeCity("Chennai");
+          },
+          (err) => {
+            locText.innerText = "GPS அனுமதி மறுக்கப்பட்டது. ஊரைத் தேர்ந்தெடுக்கவும்.";
+          }
+        );
+      } else {
+        locText.innerText = "உங்கள் உலாவியில் GPS வசதி இல்லை.";
+      }
+    }
+
+    function changeCity(city) {
+      currentCity = city;
+      document.getElementById("locationText").innerText = `இருப்பிடம்: ${city}`;
+    }
+
     function loadMovies() {
       const container = document.getElementById("moviesList");
       container.innerHTML = "";
-      fallbackMovies.forEach(m => {
+      latestMovies.forEach(m => {
         container.innerHTML += `
           <div class="movie-card" onclick="openShows(${m.id})">
             <img src="${m.poster}" alt="${m.title}">
@@ -129,30 +186,24 @@
       });
     }
 
-    // காட்சிகளைத் திறத்தல்
     function openShows(movieId) {
-      selectedMovie = fallbackMovies.find(m => m.id === movieId);
+      selectedMovie = latestMovies.find(m => m.id === movieId);
       document.getElementById("modalMovieTitle").innerText = selectedMovie.title;
       document.getElementById("modalMovieMeta").innerText = `${selectedMovie.genre} | ${selectedMovie.duration}`;
       
+      const theatres = cityTheatres[currentCity] || cityTheatres["Chennai"];
       const theatresContainer = document.getElementById("theatresList");
-      theatresContainer.innerHTML = `
-        <div class="theatre-card">
-          <strong>SPI Cinemas (சத்யம்) - ராயப்பேட்டை</strong>
-          <div>
-            <button class="show-btn" onclick="selectShow('10:30 AM')">10:30 AM</button>
-            <button class="show-btn" onclick="selectShow('02:15 PM')">02:15 PM</button>
-            <button class="show-btn" onclick="selectShow('06:45 PM')">06:45 PM</button>
+      theatresContainer.innerHTML = "";
+
+      theatres.forEach(t => {
+        let buttons = t.shows.map(s => `<button class="show-btn" onclick="selectShow('${t.name}', '${s}')">${s}</button>`).join("");
+        theatresContainer.innerHTML += `
+          <div class="theatre-card">
+            <strong>${t.name}</strong> - <small style="color:#94a3b8;">${t.loc}</small>
+            <div style="margin-top:6px;">${buttons}</div>
           </div>
-        </div>
-        <div class="theatre-card">
-          <strong>ரோகிணி சில்வர் ஸ்கிரீன்ஸ் - கோயம்பேடு</strong>
-          <div>
-            <button class="show-btn" onclick="selectShow('11:00 AM')">11:00 AM</button>
-            <button class="show-btn" onclick="selectShow('07:00 PM')">07:00 PM</button>
-          </div>
-        </div>
-      `;
+        `;
+      });
 
       document.getElementById("theatreSection").style.display = "block";
       document.getElementById("seatSection").style.display = "none";
@@ -160,8 +211,7 @@
       document.getElementById("bookingModal").style.display = "flex";
     }
 
-    // இருக்கைகள் அமைப்பைத் திரையிடுதல்
-    function selectShow(time) {
+    function selectShow(theatreName, time) {
       document.getElementById("theatreSection").style.display = "none";
       document.getElementById("seatSection").style.display = "block";
       document.getElementById("checkoutBar").style.display = "flex";
@@ -171,8 +221,8 @@
       selectedSeats = [];
       updateCheckout();
 
-      const seatCodes = ["A1","A2","A3","A4","A5","A6","B1","B2","B3","B4","B5","B6"];
-      const booked = ["A3", "A4", "B2"]; // மாதிரி புக் செய்யப்பட்ட சீட்டுகள்
+      const seatCodes = ["A1","A2","A3","A4","A5","A6","B1","B2","B3","B4","B5","B6","C1","C2","C3","C4","C5","C6"];
+      const booked = ["A2", "A3", "B4", "C1"];
 
       seatCodes.forEach(code => {
         const isBooked = booked.includes(code);
@@ -186,7 +236,6 @@
       });
     }
 
-    // இருக்கை தேர்வு லாஜிக்
     function toggleSeat(code, element) {
       if (selectedSeats.includes(code)) {
         selectedSeats = selectedSeats.filter(s => s !== code);
@@ -203,10 +252,9 @@
       document.getElementById("totalAmount").innerText = selectedSeats.length * ticketPrice;
     }
 
-    // டிக்கெட் முன்பதிவு உறுதி
     function confirmBooking() {
       if (selectedSeats.length === 0) {
-        alert("தயவுசெய்து ஒரு இருக்கையையாவது தேர்வு செய்யவும்!");
+        alert("இருக்கையைத் தேர்ந்தெடுக்கவும்!");
         return;
       }
       const bookingId = "TP" + Math.floor(100000 + Math.random() * 900000);
@@ -219,11 +267,11 @@
         <div class="ticket">
           <h3 style="color:#22c55e;">🎉 முன்பதிவு உறுதியானது!</h3>
           <p style="margin-top:8px;"><strong>படம்:</strong> ${selectedMovie.title}</p>
+          <p><strong>நகரம்:</strong> ${currentCity}</p>
           <p><strong>இருக்கைகள்:</strong> ${selectedSeats.join(', ')}</p>
-          <p><strong>செலுத்திய தொகை:</strong> ₹${selectedSeats.length * ticketPrice}</p>
-          <p style="font-size:12px; color:#94a3b8; margin-top:6px;">Booking ID: ${bookingId}</p>
+          <p><strong>தொகை:</strong> ₹${selectedSeats.length * ticketPrice}</p>
           <div class="qr-box">QR TICKET<br>${bookingId}</div>
-          <small style="color:#94a3b8;">திரையரங்க வாசலில் இந்த QR குறியீட்டைக் காட்டவும்</small>
+          <small style="color:#94a3b8;">தியேட்டர் வாசலில் இதைக் காட்டவும்</small>
         </div>
       `;
     }
@@ -233,8 +281,9 @@
       document.getElementById("checkoutBar").style.display = "none";
     }
 
-    // தொடங்குதல்
+    // தொடக்கம்
     loadMovies();
+    detectGPS();
   </script>
 </body>
 </html>
