@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThiraiPass - கேட் டிக்கெட் சரிபார்ப்பு (Gate Staff)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0b1329; color: #f1f5f9; min-height: 100vh; padding: 16px; display: flex; flex-direction: column; align-items: center; }
+
+    header { width: 100%; max-width: 450px; text-align: center; padding: 14px 0; border-bottom: 2px solid #22c55e; margin-bottom: 20px; }
+    .logo { font-size: 20px; font-weight: bold; color: #fff; }
+    .badge { background: #22c55e; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-left: 6px; }
+
+    .card { background: #1e293b; width: 100%; max-width: 450px; padding: 20px; border-radius: 14px; border: 1px solid #334155; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+    
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 8px; }
+    input { width: 100%; background: #0f172a; border: 2px solid #475569; color: #38bdf8; font-size: 22px; font-weight: bold; padding: 14px; border-radius: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; outline: none; }
+    input:focus { border-color: #22c55e; }
+
+    .btn-verify { width: 100%; background: #22c55e; color: #000; font-size: 18px; font-weight: bold; padding: 14px; border: none; border-radius: 10px; margin-top: 14px; cursor: pointer; }
+    .btn-verify:active { transform: scale(0.98); }
+
+    /* Verification Result Display */
+    .result-box { margin-top: 20px; padding: 18px; border-radius: 12px; text-align: center; display: none; }
+    .valid { background: #064e3b; border: 2px solid #10b981; color: #ecfdf5; }
+    .invalid { background: #7f1d1d; border: 2px solid #ef4444; color: #fef2f2; }
+    .used { background: #78350f; border: 2px solid #f59e0b; color: #fffbeb; }
+
+    .status-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
+    .details { font-size: 15px; margin-top: 6px; line-height: 1.5; }
+    .seats-highlight { font-size: 20px; font-weight: bold; color: #facc15; margin-top: 8px; }
+
+    /* Recent Scanned List */
+    .history-card { width: 100%; max-width: 450px; margin-top: 20px; }
+    .history-item { background: #1e293b; padding: 10px 14px; border-radius: 8px; margin-top: 8px; display: flex; justify-content: space-between; font-size: 13px; border-left: 4px solid #22c55e; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🎟️ ThiraiPass <span class="badge">GATE STAFF</span></div>
+    <small style="color: #94a3b8;">திரையரங்கு நுழைவாயில் டிக்கெட் சரிபார்ப்பு</small>
+  </header>
+
+  <div class="card">
+    <label>ரசிகரின் Booking ID-ஐ உள்ளிடவும் (அல்லது QR குறியீடு):</label>
+    <input type="text" id="ticketInput" placeholder="TP..." autofocus>
+    <button class="btn-verify" onclick="checkTicket()">உறுதி செய் (VERIFY)</button>
+
+    <!-- சரிபார்ப்பு முடிவு திரை -->
+    <div id="resultBox" class="result-box">
+      <div id="statusTitle" class="status-title"></div>
+      <div id="ticketDetails" class="details"></div>
+      <div id="seatsDisplay" class="seats-highlight"></div>
+    </div>
+  </div>
+
+  <!-- சமீபத்தில் சரிபார்க்கப்பட்ட டிக்கெட்டுகள் -->
+  <div class="history-card">
+    <h4 style="font-size: 14px; color: #94a3b8; margin-bottom: 6px;">சமீபத்தில் அனுமதிக்கப்பட்டவர்கள்:</h4>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    // பதிவு செய்யப்பட்ட மாதிரி டிக்கெட்டுகள்
+    const ticketDatabase = {
+      "TP847291": { movie: "அமரன் (Amaran)", time: "10:30 AM", screen: "Screen 1", seats: ["A4", "A5"], used: false },
+      "TP392811": { movie: "GOAT", time: "11:00 AM", screen: "Audi 2", seats: ["B1", "B2", "B3"], used: false },
+      "TP194820": { movie: "லியோ (Leo)", time: "02:15 PM", screen: "Screen 1", seats: ["C2", "C3"], used: true }
+    };
+
+    let scannedHistory = [];
+
+    function checkTicket() {
+      const input = document.getElementById("ticketInput");
+      const id = input.value.trim().toUpperCase();
+      const resBox = document.getElementById("resultBox");
+      const title = document.getElementById("statusTitle");
+      const details = document.getElementById("ticketDetails");
+      const seats = document.getElementById("seatsDisplay");
+
+      if (!id) {
+        alert("தயவுசெய்து Booking ID உள்ளிடவும்!");
+        return;
+      }
+
+      resBox.style.display = "block";
+
+      const ticket = ticketDatabase[id];
+
+      if (ticket) {
+        if (ticket.used) {
+          // ஏற்கனவே பயன்படுத்தப்பட்ட டிக்கெட்
+          resBox.className = "result-box used";
+          title.innerHTML = "⚠️ ஏற்கனவே நுழைந்த டிக்கெட்!";
+          details.innerHTML = `படம்: <strong>${ticket.movie}</strong><br>நேரம்: ${ticket.time} | ${ticket.screen}`;
+          seats.innerHTML = `இருக்கைகள்: ${ticket.seats.join(", ")}<br><small style="font-size:12px; color:#fef08a;">இந்த டிக்கெட் ஏற்கனவே ஸ்கேன் செய்யப்பட்டுவிட்டது!</small>`;
+        } else {
+          // சரியான புதிய டிக்கெட்
+          ticket.used = true; // இப்போது பயன்படுத்தப்பட்டதாக மாற்றுதல்
+          resBox.className = "result-box valid";
+          title.innerHTML = "✅ செல்லுபடியாகும் டிக்கெட்!";
+          details.innerHTML = `படம்: <strong>${ticket.movie}</strong><br>காட்சி: ${ticket.time} • ${ticket.screen}`;
+          seats.innerHTML = `அனுமதிக்கப்பட்ட இருக்கைகள்: ${ticket.seats.join(", ")}`;
+
+          // வரலாற்றில் சேர்த்தல்
+          addHistory(id, ticket.movie, ticket.seats);
+        }
+      } else if (id.startsWith("TP")) {
+        // ஆப்பில் புதிதாக புக் செய்யப்பட்ட எந்தவொரு TP டிக்கெட்டிற்கும் அனுமதி
+        resBox.className = "result-box valid";
+        title.innerHTML = "✅ செல்லுபடியாகும் டிக்கெட்!";
+        details.innerHTML = `படம்: <strong>அமரன் (Amaran)</strong><br>காட்சி: 10:30 AM • Screen 1`;
+        seats.innerHTML = `இருக்கைகள்: A1, A2 (அனுமதிக்கலாம்)`;
+        addHistory(id, "அமரன்", ["A1", "A2"]);
+      } else {
+        // தவறான டிக்கெட்
+        resBox.className = "result-box invalid";
+        title.innerHTML = "❌ தவறான டிக்கெட்!";
+        details.innerHTML = "இந்த முன்பதிவு எண் நமது கணினியில் இல்லை.";
+        seats.innerHTML = "உள்ளே அனுமதிக்க வேண்டாம்!";
+      }
+
+      input.value = "";
+      input.focus();
+    }
+
+    function addHistory(id, movie, seats) {
+      const list = document.getElementById("historyList");
+      const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const item = `
+        <div class="history-item">
+          <div><strong>${id}</strong> (${movie})</div>
+          <div style="color:#22c55e;"><strong>${seats.join(", ")}</strong> • <small style="color:#94a3b8;">${timeNow}</small></div>
+        </div>
+      `;
+      list.innerHTML = item + list.innerHTML;
+    }
+  </script>
+</body>
+</html>
